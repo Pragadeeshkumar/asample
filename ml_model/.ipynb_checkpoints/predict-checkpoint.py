@@ -1,0 +1,106 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "id": "34126b76-a347-41c4-87b6-e06e182b9fd2",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "🔍 Predicting for bnbusdt...\n",
+      "✅ Predictions saved for bnbusdt → C:\\Users\\praga\\OneDrive\\Desktop\\Trading Bot\\data\\prediction\\bnbusdt_predictions.csv\n",
+      "\n",
+      "🔍 Predicting for btcusdt...\n",
+      "✅ Predictions saved for btcusdt → C:\\Users\\praga\\OneDrive\\Desktop\\Trading Bot\\data\\prediction\\btcusdt_predictions.csv\n",
+      "\n",
+      "🔍 Predicting for ethusdt...\n",
+      "✅ Predictions saved for ethusdt → C:\\Users\\praga\\OneDrive\\Desktop\\Trading Bot\\data\\prediction\\ethusdt_predictions.csv\n",
+      "\n",
+      "🔍 Predicting for solusdt...\n",
+      "✅ Predictions saved for solusdt → C:\\Users\\praga\\OneDrive\\Desktop\\Trading Bot\\data\\prediction\\solusdt_predictions.csv\n",
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "import pandas as pd\n",
+    "import joblib\n",
+    "import os\n",
+    "\n",
+    "signal_folder = r\"C:\\Users\\praga\\OneDrive\\Desktop\\Trading Bot\\data\\signals\"\n",
+    "prediction_folder = r\"C:\\Users\\praga\\OneDrive\\Desktop\\Trading Bot\\data\\prediction\"\n",
+    "model_folder = r\"C:\\Users\\praga\\OneDrive\\Desktop\\Trading Bot\\ml_model\"\n",
+    "os.makedirs(prediction_folder, exist_ok=True)\n",
+    "\n",
+    "features = ['rsi14', 'ema20', 'MACD_12_26_9', 'MACDs_12_26_9']\n",
+    "\n",
+    "for file in os.listdir(signal_folder):\n",
+    "    if file.endswith(\"_signals.csv\"):\n",
+    "        symbol = file.replace(\"_signals.csv\", \"\")\n",
+    "        print(f\"🔍 Predicting for {symbol}...\")\n",
+    "\n",
+    "        signal_path = os.path.join(signal_folder, file)\n",
+    "        model_path = os.path.join(model_folder, f\"{symbol}_model.pkl\")\n",
+    "\n",
+    "        if not os.path.exists(model_path):\n",
+    "            print(f\"⚠️ No model found for {symbol}, skipping.\")\n",
+    "            continue\n",
+    "\n",
+    "        try:\n",
+    "            df = pd.read_csv(signal_path)\n",
+    "            df = df.dropna()\n",
+    "\n",
+    "            model = joblib.load(model_path)\n",
+    "            df['ml_prediction'] = model.predict(df[features])\n",
+    "\n",
+    "            # Save predictions\n",
+    "            output_path = os.path.join(prediction_folder, f\"{symbol}_predictions.csv\")\n",
+    "            df.to_csv(output_path, index=False)\n",
+    "            print(f\"✅ Predictions saved for {symbol} → {output_path}\\n\")\n",
+    "\n",
+    "        except Exception as e:\n",
+    "            print(f\"🔥 Error for {symbol}: {e}\")\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ea3e8c6e-6e9b-476c-bd2c-721ba81e6d9f",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "95438d24-591f-457e-a190-ecee12610095",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
